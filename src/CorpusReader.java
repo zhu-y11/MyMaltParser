@@ -16,6 +16,7 @@ public class CorpusReader
 		Corpus corp = new Corpus();
 		Sentence sent = new Sentence();
 		Word word;
+		System.out.println( "Reading Corpus..." );
 		
 		while( ( line = reader.readLine() ) != null )
 		{
@@ -28,7 +29,7 @@ public class CorpusReader
 					if( arc.head == 0 || arc.dependent == 0 )
 						continue;
 				}
-				sent.Clear();
+				sent = new Sentence();
 				continue;
 			}
 			
@@ -36,6 +37,7 @@ public class CorpusReader
 			sent.AddWord( word );
 		}
 		reader.close();
+		System.out.println( corp.sent_num + " sentences in total." );
 		return corp;
 	}
 	

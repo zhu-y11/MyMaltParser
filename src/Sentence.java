@@ -31,51 +31,57 @@ public class Sentence
 	}
 	
 	boolean CheckProjective()
-	{
-		boolean proj = true;
-		
-		for( Arc arc_right: arcs )
+	{		
+		for( Arc arc: this.arcs )
 		{
-			if( arc_right.direction.equals( Arc.LEFT_ARC ) )
+			int small_idx, big_idx;
+			if( arc.dependent >= arc.head )
 			{
-				continue;
+				small_idx = arc.head;
+				big_idx = arc.dependent;
+			}
+			else
+			{
+				small_idx = arc.dependent;
+				big_idx = arc.head;
 			}
 			
-			for( Arc arc_left: arcs )
+			for( int i = small_idx + 1; i < big_idx; i++ )
 			{
-				if( arc_left.direction.equals( Arc.RIGHT_ARC ) )
+				for( int j = 0; j < this.words.size(); j++ )
 				{
-					continue;
-				}
-				
-				//Intersection, non projective
-				if( arc_left.dependent < arc_right.head && 
-					arc_left.head >arc_right.head && 
-					arc_left.head <= arc_right.dependent
-					|| 
-				    arc_right.head < arc_left.dependent && 
-				    	arc_right.dependent > arc_left.dependent && 
-				    	arc_right.dependent <= arc_left.head )
-				{
-					proj = false;
-					break;
+					if( j >= small_idx && j <= big_idx )
+					{
+						continue;
+					}
+					
+					if( this.ContainArc( i, j ) )
+					{
+						return false;
+					}
 				}
 			}
 			
-			if( !proj )
-			{
-				break;
-			}
 		}
-		
-		return proj;
-		
+		return true;
 	}
 	
-	void Clear()
+	boolean ContainArc( int start, int end )
 	{
-		this.words.clear();
-		this.arcs.clear();
+		if( start >= end )
+		{
+			return false;
+		}
+		
+		for( Arc arc: this.arcs )
+		{
+			if( arc.dependent == start && arc.head == end ||
+				arc.dependent == end && arc.head == start )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	Word GetWord( int id )
@@ -122,24 +128,40 @@ public class Sentence
 		{
 			if( arc.head == stack_wordid && arc.dependent == buffer_wordid )
 			{
-				rel = Arc.RIGHT_ARC + ":" + arc.deprel;
+				rel = Arc.RIGHT_ARC + "_" + arc.deprel;
 				break;
 			}
 			
 			if( arc.head == buffer_wordid && arc.dependent == stack_wordid )
 			{
-				rel = Arc.LEFT_ARC + ":" + arc.deprel;
+				rel = Arc.LEFT_ARC + "_" + arc.deprel;
 				break;
 			}
 		}
 		return rel;
 	}
+	
+	@Override
+	public String toString()
+	{
+		String sent = "";
+		for( Word word: this.words )
+		{
+			sent += word.form + " ";
+		}
+		sent = sent.substring( 0, sent.length() - 1 );
+		return sent;
+	}
 }
 
 class Arc
 {
-	public static final String LEFT_ARC = "left_arc";
-	public static final String RIGHT_ARC = "right_arc";
+	public static final String LEFT_ARC = "LEFT_ARC";
+	public static final String RIGHT_ARC = "RIGHT_ARC";
+	
+	Arc()
+	{
+	}
 	
 	Arc( Word word )
 	{
@@ -184,4 +206,5 @@ class Arc
 		
 		return true;
 	}
+	
 }

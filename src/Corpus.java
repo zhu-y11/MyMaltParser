@@ -1,9 +1,10 @@
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
 
-public class Corpus implements Iterable<Sentence>
+public class Corpus
 {
-	ArrayList<Sentence> corpus;
+	List<Sentence> corpus;
 	int sent_num;
 	
 	Corpus()
@@ -18,16 +19,10 @@ public class Corpus implements Iterable<Sentence>
 		this.sent_num = corpus.sent_num;
 	}
 	
-	@Override
-	public Iterator<Sentence> iterator() 
-	{
-        return this.corpus.iterator();
-    }
-	
 	boolean addSentence( Sentence sent )
 	{
 		this.sent_num ++;
-		return ( corpus.add( sent ) );
+		return ( this.corpus.add( sent ) );
 	}
 	
 	boolean Delete( Sentence sent )
@@ -41,5 +36,20 @@ public class Corpus implements Iterable<Sentence>
 			}
 		}
 		return false;	
+	}
+	
+	Corpus Shuffleto( int num )
+	{
+		if( num <= 0 || num >= this.sent_num )
+		{
+			return null;
+		}
+		
+		Corpus sub_corp = new Corpus( this );	
+		Collections.shuffle( sub_corp.corpus );
+		sub_corp.sent_num = num;
+		sub_corp.corpus = sub_corp.corpus.subList( 0, num );
+		
+		return sub_corp;
 	}
 }
