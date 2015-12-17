@@ -40,7 +40,7 @@ public class Corpus
 	
 	Corpus Shuffleto( int num )
 	{
-		if( num <= 0 || num >= this.sent_num )
+		if( num <= 0 || num > this.sent_num )
 		{
 			return null;
 		}
@@ -52,4 +52,30 @@ public class Corpus
 		
 		return sub_corp;
 	}
+	
+	public static String GetEnglishTrain()
+	{
+		return "data/english/train/en-universal-train.conll";
+	}
+	public static String GetEnglishTest()
+	{
+		return "data/english/test/en-universal-test.conll";
+	}
+	public static String GetDanishTrain()
+	{
+		return "data/danish/ddt/train/danish_ddt_train.conll";
+	}
+	public static String GetDanishTest()
+	{
+		return "data/danish/ddt/test/danish_ddt_test.conll";
+	}
+	public static String GetSwedishTrain()
+	{
+		return "data/swedish/talbanken05/train/swedish_talbanken05_train.conll";
+	}
+	public static String GetSwedishTest()
+	{
+		return "data/swedish/talbanken05/test/swedish_talbanken05_train.conll";
+	}
+
 }

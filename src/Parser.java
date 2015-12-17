@@ -12,11 +12,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
+import libsvm.svm;
+import libsvm.svm_model;
+
 public class Parser 
 {
 	public static List<String> feat_dict = new ArrayList<String>();
 	public static Map<String, Double> transition_dict = new HashMap<String, Double>();
 	public String train_file_name = "Training_Data";
+	public String test_file_name = "Test_Data";
 	public String train_model_file_name = "model";
 	
 	List<String> Train( Corpus train_data ) throws IOException
@@ -68,7 +72,8 @@ public class Parser
 							String key = Transition.REDUCE;
 							if( !transition_dict.containsKey( key ) )
 							{
-								transition_dict.put( key, 1.0 * transition_dict.size() );
+								double value = 1.0 * transition_dict.size();
+								transition_dict.put( key, value );
 							}
 							training_seq.add( key );
 							Transition.Reduce( conf );
@@ -80,10 +85,11 @@ public class Parser
 					else if( rel.contains( Arc.LEFT_ARC ) )
 					{
 						String key = rel,
-							   relation = rel.substring( rel.indexOf( "_") + 1 );
+							   relation = rel.substring( rel.indexOf( "-") + 1 );
 						if( !transition_dict.containsKey( key ) )
 						{
-							transition_dict.put( key, 1.0 * transition_dict.size() );
+							double value = 1.0 * transition_dict.size();
+							transition_dict.put( key, value );
 						}
 						training_seq.add( key );
 						Transition.Left_Arc( conf, relation );
@@ -94,10 +100,11 @@ public class Parser
 					else if( rel.contains( Arc.RIGHT_ARC ) )
 					{
 						String key = rel,
-							   relation = rel.substring( rel.indexOf( "_" ) + 1 );
+							   relation = rel.substring( rel.indexOf( "-" ) + 1 );
 						if( !transition_dict.containsKey( key ) )
 						{
-							transition_dict.put( key, 1.0 * transition_dict.size() );
+							double value = 1.0 * transition_dict.size();
+							transition_dict.put( key, value );
 						}
 						training_seq.add( key );
 						Transition.Right_Arc( conf, relation );
@@ -111,7 +118,8 @@ public class Parser
 				String key = Transition.SHIFT;
 				if( !transition_dict.containsKey( key ) )
 				{
-					transition_dict.put( key, 1.0 * transition_dict.size() );
+					double value = 1.0 * transition_dict.size();
+					transition_dict.put( key, value );
 				}
 				Transition.Shift( conf );
 				training_seq.add( key );
@@ -377,28 +385,19 @@ public class Parser
 		
 		return true;
 	}
-	
-	List<String> Parse( Corpus test_data ) throws IOException
+
+	void Parse( Corpus test_data ) throws IOException
 	{
-		List<String> training_seq = new ArrayList<String>();
+		Corpus result = new Corpus();
 		BufferedWriter writer = new BufferedWriter( 
 							   new OutputStreamWriter( 
-							   new FileOutputStream( new File( train_file_name ) ) ) );
+							   new FileOutputStream( new File( test_file_name ) ) ) );		
+		System.out.println( test_data.sent_num + " sentences for testing.");
 		
-		System.out.println( train_data.sent_num + " sentences in the training set.");
-		System.out.println( "Training SVM..." );
-		int projective_num = 0;
-		for( Sentence sent: train_data.corpus )
+		for( Sentence sent: test_data.corpus )
 		{
-			//check if the sentence is projective
-			if( !sent.CheckProjective() )
-			{
-				continue;
-			}
-			projective_num ++;
-	
-			//Add training samples
-			Configuration conf = new Configuration( sent );
+			//Add test samples
+			Configuration conf = new Configuration( sent );		
 			while( !conf.buffer.isEmpty() )
 			{
 				List<String> features = this.ExtractFeatures( conf, sent );
@@ -429,7 +428,7 @@ public class Parser
 							{
 								transition_dict.put( key, 1.0 * transition_dict.size() );
 							}
-							training_seq.add( key );
+							//training_seq.add( key );
 							Transition.Reduce( conf );
 							//add features:transition to libsvm file
 							writer.write( key + " " + bin_features + "\n" );
@@ -439,12 +438,12 @@ public class Parser
 					else if( rel.contains( Arc.LEFT_ARC ) )
 					{
 						String key = rel,
-							   relation = rel.substring( rel.indexOf( "_") + 1 );
+							   relation = rel.substring( rel.indexOf( "-") + 1 );
 						if( !transition_dict.containsKey( key ) )
 						{
 							transition_dict.put( key, 1.0 * transition_dict.size() );
 						}
-						training_seq.add( key );
+						//training_seq.add( key );
 						Transition.Left_Arc( conf, relation );
 						//add features:transition to libsvm file
 						writer.write( key + " " + bin_features + "\n" );
@@ -453,12 +452,12 @@ public class Parser
 					else if( rel.contains( Arc.RIGHT_ARC ) )
 					{
 						String key = rel,
-							   relation = rel.substring( rel.indexOf( "_" ) + 1 );
+							   relation = rel.substring( rel.indexOf( "-" ) + 1 );
 						if( !transition_dict.containsKey( key ) )
 						{
 							transition_dict.put( key, 1.0 * transition_dict.size() );
 						}
-						training_seq.add( key );
+						//training_seq.add( key );
 						Transition.Right_Arc( conf, relation );
 						//add features:transition to libsvm file
 						writer.write( key + " " + bin_features + "\n" );
@@ -473,7 +472,7 @@ public class Parser
 					transition_dict.put( key, 1.0 * transition_dict.size() );
 				}
 				Transition.Shift( conf );
-				training_seq.add( key );
+				//training_seq.add( key );
 				writer.write( key + " " + bin_features + "\n" );
 				//add features:transition to libsvm file	
 			}
@@ -481,13 +480,12 @@ public class Parser
 		writer.close();
 		
 		//Training using libsvm
-		SVM.train( this.train_file_name, this.train_model_file_name );
-
-		System.out.println( "Training finished, " + projective_num + 
-							" projective sentences are used for training" );
-		return training_seq;
+		//svm.svm_predict_values(arg0, arg1, arg2)
+		//svm.svm_predict_probability(arg0, arg1, arg2)
+		//svm.svm_predict(arg0, arg1)
+		//System.out.println( "Testing finished, " + "LAS:" );
+		//return training_seq;
 	}
-	
 }
 
 class Configuration

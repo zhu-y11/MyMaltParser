@@ -128,13 +128,13 @@ public class Sentence
 		{
 			if( arc.head == stack_wordid && arc.dependent == buffer_wordid )
 			{
-				rel = Arc.RIGHT_ARC + "_" + arc.deprel;
+				rel = Arc.RIGHT_ARC + "-" + arc.deprel;
 				break;
 			}
 			
 			if( arc.head == buffer_wordid && arc.dependent == stack_wordid )
 			{
-				rel = Arc.LEFT_ARC + "_" + arc.deprel;
+				rel = Arc.LEFT_ARC + "-" + arc.deprel;
 				break;
 			}
 		}

@@ -1,21 +1,25 @@
 import java.io.IOException;
 
-public class Main 
+class Main 
 {
 
 	public static void main( String[] args ) throws IOException
 	{
 		Parser parser = new Parser();
-
-		String train_filename = "data/english/train/en-universal-train.conll";
 		CorpusReader reader = new CorpusReader();
+		
+		//Training
+		String train_filename = Corpus.GetDanishTrain();
 		Corpus train_corp = reader.Read( train_filename );
-		Corpus sub_train_corp = train_corp.Shuffleto( 20 );	
+		Corpus sub_train_corp = train_corp.Shuffleto( 600 );	
 		parser.Train( sub_train_corp );
 		
-		String test_filename = "data/english/train/en-universal-train.conll";
+		//Testing
+		String test_filename = Corpus.GetDanishTest();
 		Corpus test_corp = reader.Read( test_filename );
-		Corpus sub_test_corp = test_corp.Shuffleto( 20 );	
-		parser.Parse( sub_test_corp );
+		parser.Parse( test_corp );
+		String[] parameter = { parser.test_file_name, parser.train_model_file_name, "Result" };
+		svm_predict.Run( parameter );
+
 	}
 }

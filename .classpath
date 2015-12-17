@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/marce/Documents/Java/MyMaltParser/libsvm.jar"/>
+	<classpathentry kind="lib" path="/Users/marce/Documents/code/Java/MyMaltParser/libsvm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

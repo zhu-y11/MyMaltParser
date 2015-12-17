@@ -7,6 +7,7 @@ import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
+import libsvm.svm_print_interface;
 import libsvm.svm_problem;
 
 public class SVM 
@@ -22,7 +23,7 @@ public class SVM
 			System.err.print("ERROR: "+error_msg+"\n");
 			System.exit(1);
 		}
-
+		svm.svm_set_print_string_function( svm_print_null );
 		svm_model model = svm.svm_train(problem,param);
 		svm.svm_save_model( train_model_file_name, model );
 	}
@@ -39,14 +40,15 @@ public class SVM
 		param.C = 0.5;
 		param.probability = 1;
 		
-		param.cache_size = 100;	
+		param.cache_size = 40;	
 		param.nu = 0.5;
 		param.eps = 1e-3;
 		param.p = 0.1;
-		param.shrinking = 1;
+		param.shrinking = 0;
 		param.nr_weight = 0;
 		param.weight_label = new int[0];
 		param.weight = new double[0];
+		
 		return param;
 	}
 	
@@ -109,4 +111,9 @@ public class SVM
 		fp.close();
 		return prob;
 	}
+	
+	private static svm_print_interface svm_print_null = new svm_print_interface()
+	{
+		public void print(String s) {}
+	};
 }
